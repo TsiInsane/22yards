@@ -27,7 +27,7 @@ class Simulator
         double balance = 0.0;
         int aft = aft1;
         int over_a =0, over_b=0;
-        
+        double sd_dec;
         
         if (team.getinnings() == 1)
         {
@@ -35,22 +35,45 @@ class Simulator
         }
         else 
         {
-        	System.out.println(" ");
         	System.out.println("Second innings");
-        }	
+        }
+        
+    	if(team.getinnings() == 2)
+		{
+			sd_dec=0.0;
+		}	
+    	else
+    	{
+    		sd_dec=(-0.9-Math.min(mu,0));
+    	}	
+	
         
 		for (int i=1; i<=120; i++)
 		{
 			Thread.sleep(50);
 			
+			p = Math.random();
+		
+			mu = Math.log10((float)currentBatsman.getBatting()/bowler.getBowling());
+    
+			if(team.getinnings() == 2)
+			{
+				sd_dec=0.0;
+			}	
+	    	else
+	    	{
+	    		sd_dec=(-0.9-Math.min(mu,0));
+	    	}	
+		
+			
 			if ( i>1 && i<=36)
 			{
-				sigma = 1.0 + Math.max(balance, (-0.9-Math.min(mu,0))) + 0.2 ;  //PP
+				sigma = 1.0 + Math.max(balance, sd_dec) + 0.2 ;  //PP
 					
 			}
 			else if (i>36 && i<=102)
 			{
-				sigma = 1.0 + Math.max(balance, (-0.9-Math.min(mu,0)));  
+				sigma = 1.0 + Math.max(balance, sd_dec);  
 			}
 			
 			else if (i>102) // Left free in final 3 overs
@@ -59,10 +82,8 @@ class Simulator
 			}
 	
 			
-			p = Math.random();
-		
-			mu = Math.log10((float)currentBatsman.getBatting()/bowler.getBowling());
-    
+			
+			
 			if (currentBatsman.getBatting() > bowler.getBowling() )
 			{
 				mu = mu * 0.3;
@@ -82,12 +103,12 @@ class Simulator
 				if (wickets == 10 && team.getinnings() == 1)
 				{
 					System.out.println("All out for " + total_runs);
-					System.out.println("AFT was: "+aft);
 					team.setinningScore(total_runs);
 					break;
 				}
 				else if (wickets == 10 && team.getinnings() == 2 && total_runs < (match1.getFirstInningScore()))
 				{
+					System.out.println("Team B score: "+total_runs);
 					System.out.println("Team A won by " + (match1.getFirstInningScore()-total_runs) + " runs");
 					break;
 				}	
@@ -152,7 +173,7 @@ class Simulator
 				over_b=0;
 			}
 				
-			System.out.println("Overs: "+ over_a + "." + over_b + ", Batsman: " + currentBatsman.getfName() + ", Bowler: " + bowler.getfName() + ", Runs: " + runs + ", Score: "+total_runs+" / "+wickets);
+	//		System.out.println("Overs: "+ over_a + "." + over_b + ", Batsman: " + currentBatsman.getfName() + ", Bowler: " + bowler.getfName() + ", Runs: " + runs + ", Score: "+total_runs+" / "+wickets);
 			
 			if (i%6 == 0)
 			{
@@ -160,7 +181,8 @@ class Simulator
 			}
 			
 			if (team.getinnings() == 2 && total_runs>match1.getFirstInningScore())
-			{
+			{   
+				System.out.println("Team B score: "+total_runs);
 				System.out.println("Team B won by " + (10-wickets) + " wickets");
 				break;
 			}
@@ -176,15 +198,14 @@ class Simulator
 		if (team.getinnings() == 1)
 		{
 			System.out.println("Team A score: "+total_runs);
-			
-			System.out.println("AFT was: "+aft);
-			
 		}    
 		
 		    
 		if (team.getinnings() == 2 && total_runs < match1.getFirstInningScore())
+		{
+			System.out.println("Team B score: "+total_runs);
 			System.out.println("Team A won by " + (match1.getFirstInningScore()-total_runs) + " runs");
-		
+		}
 		
 		return team.getinningScore();	
 	}

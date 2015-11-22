@@ -12,7 +12,7 @@ public class Match {
 	   	return matchId;
 	 }
 	    
-	 public void setTeamId(int matchId)
+	 public void setMatchId(int matchId)
 	 {
 	 this.matchId = matchId;
 	 }
